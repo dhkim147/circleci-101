@@ -1,40 +1,24 @@
 version: 2
+#버전(CI버전. 2로 고정하는 것이 좋다
 jobs:
-  one:
+  build:
+  #빌드하는 설정하는 곳
     docker:
-      - image: circleci/ruby:2.4.1
+    #도커를 쓰겠다
+      - image: circleci/python:3.7.0-node-browsers
+      #이 이미지로 실행을 하겠다. (기본적으로 지원해주는 이미지가 많습니다.
+      
+    working_directory: ~/repo
+    #작업할 공간(ls해보면 대강 이해 가능
+    
     steps:
-      - checkout
-      - run: echo "A first hello"
-      - run: mkdir -p my_workspace
-      - run: echo "Trying out workspaces" > my_workspace/echo-output
-      - persist_to_workspace:
-          # Must be an absolute path, or relative path from working_directory
-          root: my_workspace
-          # Must be relative path from root
-          paths:
-            - echo-output      
-  two:
-    docker:
-      - image: circleci/ruby:2.4.1
-    steps:
-      - checkout
-      - run: echo "A more familiar hi"  
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: my_workspace
-
-      - run: |
-          if [[ $(cat my_workspace/echo-output) == "Trying out workspaces" ]]; then
-            echo "It worked!";
-          else
-            echo "Nope!"; exit 1
-          fi
-workflows:
-  version: 2
-  one_and_two:
-    jobs:
-      - one
-      - two:
-          requires:
-            - one
+      #실행하는 곳
+      #run부터 쭉 복사한다음에 실행하면 된다.
+      - run:
+          name: Test or Procedure Name
+          #실행하는 작업 이름
+          command: | #'|'가 있어야 여러줄 사용 가능
+              Commands
+              #커맨드들
+              Commands
+              Commands
