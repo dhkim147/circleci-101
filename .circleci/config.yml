@@ -1,46 +1,8 @@
- version: 2
- jobs:
- build:
-   docker:
-     - image: circleci/node:7.10
-   working_directory: ~/repo
-   steps:
-     - checkout
-     - restore_cache:
-         keys:
-         - v1-dependencies-{{ checksum "package.json" }}
-         - v1-dependencies-
-     - run: yarn install
-     - save_cache:
-         paths:
-           - node_modules
-         key: v1-dependencies-{{ checksum "package.json" }}
-     - run: yarn test
-     - run: yarn build
-     - run:
-         command: |
-           tar cvf application.tar.gz -C build .
-     - run:
-         command: |
-           mkdir -p /tmp/artifacts
-           mv application.tar.gz /tmp/artifacts
-     - store_artifacts:
-         path: /tmp/artifacts
- deploy:
-   machine:
-     enabled: true
-   steps:
-     - run:
-         command: |
-           echo "Deploy Over SSH"
- workflows:
-   version: 2
-   build-and-deploy:
-     jobs:
-       - build
-       - deploy:
-         requires:
-           - build
-         filters:
-           branches:
-             only: master
+version: 2.1
+jobs:
+  build:
+    docker: 
+      - image: circleci/node:4.8.2 # the primary container, where your job's commands are run
+    steps:
+      - checkout # check out the code in the project directory
+      - run: echo "hello world" # run the `echo` command
