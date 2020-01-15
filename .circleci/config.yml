@@ -1,24 +1,46 @@
-version: 2
-#버전(CI버전. 2로 고정하는 것이 좋다
-jobs:
-  build:
-  #빌드하는 설정하는 곳
-    docker:
-    #도커를 쓰겠다
-      - image: circleci/python:3.7.0-node-browsers
-      #이 이미지로 실행을 하겠다. (기본적으로 지원해주는 이미지가 많습니다.
-      
-    working_directory: ~/repo
-    #작업할 공간(ls해보면 대강 이해 가능
-    
-    steps:
-      #실행하는 곳
-      #run부터 쭉 복사한다음에 실행하면 된다.
-      - run:
-          name: Test or Procedure Name
-          #실행하는 작업 이름
-          command: | #'|'가 있어야 여러줄 사용 가능
-              Commands
-              #커맨드들
-              Commands
-              Commands
+ version: 2
+ jobs:
+ build:
+   docker:
+     - image: circleci/node:7.10
+   working_directory: ~/repo
+   steps:
+     - checkout
+     - restore_cache:
+         keys:
+         - v1-dependencies-{{ checksum "package.json" }}
+         - v1-dependencies-
+     - run: yarn install
+     - save_cache:
+         paths:
+           - node_modules
+         key: v1-dependencies-{{ checksum "package.json" }}
+     - run: yarn test
+     - run: yarn build
+     - run:
+         command: |
+           tar cvf application.tar.gz -C build .
+     - run:
+         command: |
+           mkdir -p /tmp/artifacts
+           mv application.tar.gz /tmp/artifacts
+     - store_artifacts:
+         path: /tmp/artifacts
+ deploy:
+   machine:
+     enabled: true
+   steps:
+     - run:
+         command: |
+           echo "Deploy Over SSH"
+ workflows:
+   version: 2
+   build-and-deploy:
+     jobs:
+       - build
+       - deploy:
+         requires:
+           - build
+         filters:
+           branches:
+             only: master
